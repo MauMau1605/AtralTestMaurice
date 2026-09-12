@@ -1,0 +1,7 @@
+# Build & objets
+build/
+bin/
+out/
+*.o
+*.elf
+*.bin
