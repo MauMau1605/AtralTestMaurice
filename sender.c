@@ -80,21 +80,17 @@ int main(int argc, char *argv[])
         uint16_t src_addr = (uint16_t)((msg[offset] << 8) | msg[offset + 1]);
         uint8_t payload[SOURCE_PAYLOAD_SIZE];
         memcpy(payload, &msg[offset + SOURCE_ADDR_SIZE], SOURCE_PAYLOAD_SIZE);
-	if (cipher == 1) 
-    {
-		 for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++)
-			payload[i] = (uint8_t)(payload[i] ^ PRESHARED_KEY);
-	}
-	else
-	{ 
-        if (cipher !=0)
+        if (cipher == CIPHER_XOR) 
         {
+            for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++)
+                payload[i] = (uint8_t)(payload[i] ^ PRESHARED_KEY);
+        }
+        else if (cipher == CIPHER_MOD)
+        { 
             for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++) {
                 payload[i] = (uint8_t)(payload[i] + PRESHARED_KEY);
-                
             }
         }
-	}
         memset(&rec, 0, sizeof(rec));
         rec.type = '1';
         rec.address = src_addr;

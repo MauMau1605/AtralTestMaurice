@@ -76,16 +76,14 @@ int main(void)
         if (rec.type == '1') {
             size_t end = (size_t)rec.address + rec.data_len;
             uint8_t addr_bytes[SOURCE_ADDR_SIZE];
-            if (cipher == 1) {
+            if (cipher == CIPHER_XOR) {
                 /* Decrypt 3-byte payload */
                 for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++)
                     rec.data[i] = (uint8_t)(rec.data[i] ^ PRESHARED_KEY);
             }
-            else {
-                if (cipher != 0) {
-                    for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++) {
-                        rec.data[i] = (uint8_t)(rec.data[i] - PRESHARED_KEY);
-                    }
+            else if (cipher == CIPHER_MOD) {
+                for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++) {
+                    rec.data[i] = (uint8_t)(rec.data[i] - PRESHARED_KEY);
                 }
             }
             if (end > total_len)
