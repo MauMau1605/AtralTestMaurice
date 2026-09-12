@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
         memcpy(payload, &msg[offset + SOURCE_ADDR_SIZE], SOURCE_PAYLOAD_SIZE);
 	if (cipher == 1) 
     {
-		 for (int i = cipher; i < SOURCE_PAYLOAD_SIZE; i++)
+		 for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++)
 			payload[i] = (uint8_t)(payload[i] ^ PRESHARED_KEY);
 	}
 	else
