@@ -76,23 +76,22 @@ int main(void)
         if (rec.type == '1') {
             size_t end = (size_t)rec.address + rec.data_len;
             uint8_t addr_bytes[SOURCE_ADDR_SIZE];
-            if (cipher = 1) {
+            if (cipher == 1) {
                 /* Decrypt 3-byte payload */
                 for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++)
                     rec.data[i] = (uint8_t)(rec.data[i] ^ PRESHARED_KEY);
             }
-	    else {
-		    if (cipher !=0 ) {
-			for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++)
-        		{
-			    rec.data[i] = (uint8_t)(rec.data[i] - PRESHARED_KEY);
-		        }
-		    }
-		}
+            else {
+                if (cipher != 0) {
+                    for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++) {
+                        rec.data[i] = (uint8_t)(rec.data[i] - PRESHARED_KEY);
+                    }
+                }
+            }
             if (end > total_len)
                 total_len = end;
-            addr_bytes[0] = (uint8_t)(rec.address & 0xFF);
-            addr_bytes[1] = (uint8_t)((rec.address >> 8) & 0xFF);
+            addr_bytes[0] = (uint8_t)((rec.address >> 8) & 0xFF);
+            addr_bytes[1] = (uint8_t)(rec.address & 0xFF);
             fwrite(addr_bytes, 1, sizeof(addr_bytes), out);
             fwrite(rec.data, 1, rec.data_len, out);
 	    /* Debug traces uncomment for debug*/

@@ -71,7 +71,7 @@ int srec_decode(const char *line, srec_record_t *rec)
 
     addr_hi = hex_byte(&line[4]);
     addr_lo = hex_byte(&line[6]);
-    rec->address = (uint16_t)((addr_hi) | addr_lo);
+    rec->address = (uint16_t)((addr_hi << 8) | addr_lo);
     rec->data_len = (uint8_t)(count - 3); 
     for (i = 0; i < rec->data_len; i++) {
         rec->data[i] = (uint8_t) hex_byte(&line[8 + i * 2]);

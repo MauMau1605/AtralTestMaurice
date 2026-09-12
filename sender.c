@@ -8,6 +8,7 @@
 
 static int send_line(int fd, const char *line)
 {
+    printf("[TX] %s\n", line);
     size_t len = strlen(line);
     char buf[SREC_MAX_LINE_LEN + 1];
     if (len + 1 >= sizeof(buf))
@@ -71,22 +72,28 @@ int main(int argc, char *argv[])
     rec.data_len = 0;
     srec_encode(&rec, line, sizeof(line));
     send_line(conn_fd, line);
+
+    
     /* S1 : one record per [address|payload] entry of the source file. */
-    for (offset = 0; offset < msg_len; offset += SOURCE_RECORD_SIZE) {
+    for (offset = 0; offset < msg_len; offset += SOURCE_RECORD_SIZE) 
+    {
         uint16_t src_addr = (uint16_t)((msg[offset] << 8) | msg[offset + 1]);
         uint8_t payload[SOURCE_PAYLOAD_SIZE];
         memcpy(payload, &msg[offset + SOURCE_ADDR_SIZE], SOURCE_PAYLOAD_SIZE);
-	if (cipher == 1) {
+	if (cipher == 1) 
+    {
 		 for (int i = cipher; i < SOURCE_PAYLOAD_SIZE; i++)
 			payload[i] = (uint8_t)(payload[i] ^ PRESHARED_KEY);
 	}
 	else
-	{ if (cipher !=0){
-        		for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++) {
-        			payload[i] = (uint8_t)(payload[i] + PRESHARED_KEY);
-		            
-        		}
-		}
+	{ 
+        if (cipher !=0)
+        {
+            for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++) {
+                payload[i] = (uint8_t)(payload[i] + PRESHARED_KEY);
+                
+            }
+        }
 	}
         memset(&rec, 0, sizeof(rec));
         rec.type = '1';
@@ -103,7 +110,7 @@ int main(int argc, char *argv[])
     rec.data_len = 0;
     srec_encode(&rec, line, sizeof(line));
     send_line(conn_fd, line);
-    printf("Done. %l bytes sent in %ld record(s).\n",
+    printf("Done. %ld bytes sent in %ld record(s).\n",
            msg_len, (msg_len / SOURCE_RECORD_SIZE) + 2);
     ipc_close(conn_fd);
     ipc_close(listen_fd);
