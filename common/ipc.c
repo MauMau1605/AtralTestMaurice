@@ -14,8 +14,8 @@
 
 int ipc_server_open(void)
 {
-    int listen_fd;
-    struct sockaddr_un addr;
+    int listen_fd = -1;
+    struct sockaddr_un addr = {0};
 
     listen_fd = socket(AF_UNIX, SOCK_STREAM, 0);
     if (listen_fd < 0) {
@@ -55,8 +55,8 @@ int ipc_server_accept(int listen_fd)
 
 int ipc_client_connect(void)
 {
-    int fd;
-    struct sockaddr_un addr;
+    int fd = -1;
+    struct sockaddr_un addr = {0};
 
     fd = socket(AF_UNIX, SOCK_STREAM, 0);
     if (fd < 0) {

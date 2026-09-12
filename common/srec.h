@@ -20,17 +20,20 @@ typedef struct {
     uint8_t  data_len;
 } srec_record_t;
 
-/*
- * Encode a record into an ASCII SREC line (no trailing newline).
- * Returns the line length on success, -1 on error (buffer too small, bad data_len).
+/**
+ * @brief Encode a record into an ASCII SREC line without trailing newline.
+ * @param rec Input record to encode.
+ * @param out_line Output buffer that receives the encoded ASCII line.
+ * @param out_size Size of out_line in bytes.
+ * @return Encoded line length on success, -1 on error.
  */
 int srec_encode(const srec_record_t *rec, char *out_line, size_t out_size);
 
-/*
- * Decode an ASCII SREC line into a record.
- * Returns 0 on success.
- * Returns -1 if the line is malformed (bad format, odd hex length, too short).
- * Returns -2 if the checksum does not match (data integrity failure).
+/**
+ * @brief Decode an ASCII SREC line into a record.
+ * @param line Null-terminated ASCII SREC input line.
+ * @param rec Output record filled with decoded content.
+ * @return 0 on success, -1 on malformed input, -2 on checksum mismatch.
  */
 int srec_decode(const char *line, srec_record_t *rec);
 

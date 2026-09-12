@@ -28,11 +28,11 @@ static int hex_byte(const char *s)
 int srec_encode(const srec_record_t *rec, char *out_line, size_t out_size)
 {
     uint8_t payload[2 + SREC_MAX_DATA];
-    uint8_t count;
-    uint8_t sum;
-    uint8_t checksum;
-    size_t pos;
-    int i;
+    uint8_t count = 0;
+    uint8_t sum = 0;
+    uint8_t checksum = 0;
+    size_t pos = 0;
+    int i = 0;
     if (rec->data_len > SREC_MAX_DATA)
         return -1;
     /* payload = address (2 bytes, big endian) + data */
@@ -56,27 +56,64 @@ int srec_encode(const srec_record_t *rec, char *out_line, size_t out_size)
 
 int srec_decode(const char *line, srec_record_t *rec)
 {
-    size_t len = strlen(line);
-    int count;
-    uint8_t sum;
-    size_t i;
-    int addr_hi, addr_lo;
-    int checksum_read;
+    size_t len = 0;
+    int count = 0;
+    uint8_t sum = 0;
+    int addr_hi = 0, addr_lo = 0;
+    int checksum_read = 0;
+    uint8_t expected_checksum = 0;
+
+    if (!line || !rec)
+        return -1;
+
+    len = strlen(line);
     /* trim trailing CR/LF */
     while (len > 0 && (line[len - 1] == '\n' || line[len - 1] == '\r'))
         len--;
-    if (line[0] != 'S')
+
+    /* Minimum SREC line: 'S' + type (1) + count (2) + addr (4) + checksum (2) = 10 chars */
+    if (len < 10 || line[0] != 'S')
         return -1;
-    rec->type = line[1];
+
+    char type = line[1];
+    if (type != '0' && type != '1' && type != '9')
+        return -1;
+    rec->type = type;
+
     count = hex_byte(&line[2]);
+    if (count < 3 || count > (int)(2 + SREC_MAX_DATA + 1))
+        return -1;
+
+    /* Total expected line length: 'S' (1) + type (1) + count (2) + count * 2 hex digits = 4 + count * 2 */
+    if (len != (size_t)(4 + count * 2))
+        return -1;
+
+    sum = (uint8_t)count;
 
     addr_hi = hex_byte(&line[4]);
     addr_lo = hex_byte(&line[6]);
+    if (addr_hi < 0 || addr_lo < 0)
+        return -1;
+
+    sum = (uint8_t)(sum + addr_hi + addr_lo);
     rec->address = (uint16_t)((addr_hi << 8) | addr_lo);
     rec->data_len = (uint8_t)(count - 3);
-    for (i = 0; i < rec->data_len; i++) {
-        rec->data[i] = (uint8_t) hex_byte(&line[8 + i * 2]);
+
+    for (size_t i = 0; i < rec->data_len; i++) {
+        int val = hex_byte(&line[8 + i * 2]);
+        if (val < 0)
+            return -1;
+        rec->data[i] = (uint8_t)val;
+        sum = (uint8_t)(sum + val);
     }
+
+    checksum_read = hex_byte(&line[8 + rec->data_len * 2]);
+    if (checksum_read < 0)
+        return -1;
+
+    expected_checksum = (uint8_t)(~sum);
+    if ((uint8_t)checksum_read != expected_checksum)
+        return -2;
 
     return 0;
 }

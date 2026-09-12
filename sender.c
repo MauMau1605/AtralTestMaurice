@@ -20,15 +20,14 @@ static int send_line(int fd, const char *line)
 
 int main(int argc, char *argv[])
 {
-    const char *input_path;
+    const char *input_path = NULL;
     int cipher = 0;
-    uint8_t *msg;
-    long msg_len;
-    int listen_fd, conn_fd;
-    char line[SREC_MAX_LINE_LEN];
+    uint8_t *msg = NULL;
+    long msg_len = 0;
+    int listen_fd = -1, conn_fd = -1;
+    char line[SREC_MAX_LINE_LEN] = {0};
     srec_record_t rec = {0};
-    long offset;
-    int counter = 0;
+    long offset = 0;
 
     /* Usage: ./sender <input_file> [cipher_type]
      * cipher_type: 0 = none (default), 1 = xor_fixed , 2 = add_mod */
@@ -39,6 +38,11 @@ int main(int argc, char *argv[])
     input_path = argv[1];
     if (argc >= 3)
         cipher = atoi(argv[2]);
+
+    if (!cipher_is_supported((uint16_t)cipher)) {
+        fprintf(stderr, "Error: unsupported cipher type %d\n", cipher);
+        return 1;
+    }
     FILE *f = fopen(input_path, "rb");
     /* Get file size */
     fseek(f, 0, SEEK_END);
@@ -77,16 +81,7 @@ int main(int argc, char *argv[])
     for (offset = 0; offset < msg_len; offset += SOURCE_RECORD_SIZE) {
         uint16_t src_addr = (uint16_t)((msg[offset] << 8) | msg[offset + 1]);
         uint8_t payload[SOURCE_PAYLOAD_SIZE];
-        memcpy(payload, &msg[offset + SOURCE_ADDR_SIZE], SOURCE_PAYLOAD_SIZE);
-        if (cipher == CIPHER_XOR) {
-            for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++) {
-                payload[i] = (uint8_t)(payload[i] ^ PRESHARED_KEY);
-            }
-        } else if (cipher == CIPHER_MOD) {
-            for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++) {
-                payload[i] = (uint8_t)(payload[i] + PRESHARED_KEY);
-            }
-        }
+        cipher_encrypt((uint16_t)cipher, &msg[offset + SOURCE_ADDR_SIZE], payload, SOURCE_PAYLOAD_SIZE, PRESHARED_KEY);
         memset(&rec, 0, sizeof(rec));
         rec.type = '1';
         rec.address = src_addr;

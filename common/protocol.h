@@ -21,10 +21,7 @@
  */
 #define PRESHARED_KEY 0xA5
 
-/* Cipher types carried in the address field of the S0 record */
-#define CIPHER_NONE 0x0000
-#define CIPHER_XOR  0x0001
-#define CIPHER_MOD  0x0002
+#include "cipher.h"
 
 /* Bytes of address per source memory record (16-bit). */
 #define SOURCE_ADDR_SIZE 2
