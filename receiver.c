@@ -62,15 +62,14 @@ int main(void)
     while (1) {
         if (read_line(fd, line, sizeof(line)) == 0)
             break;
-        if (srec_decode(line, &rec)!= 0)
-        {
+        if (srec_decode(line, &rec) != 0) {
             printf("error on line: %s\n", line);
             ipc_close(fd);
             return 1;
         }
         if (rec.type == '0') {
             cipher = rec.address;
-	    /* Debug traces uncomment for debug*/
+            /* Debug traces uncomment for debug*/
             /* printf("Header received: CIPHER_TYPE=0x%04X\n", rec.address); */
         }
         if (rec.type == '1') {
@@ -78,10 +77,10 @@ int main(void)
             uint8_t addr_bytes[SOURCE_ADDR_SIZE];
             if (cipher == CIPHER_XOR) {
                 /* Decrypt 3-byte payload */
-                for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++)
+                for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++) {
                     rec.data[i] = (uint8_t)(rec.data[i] ^ PRESHARED_KEY);
-            }
-            else if (cipher == CIPHER_MOD) {
+                }
+            } else if (cipher == CIPHER_MOD) {
                 for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++) {
                     rec.data[i] = (uint8_t)(rec.data[i] - PRESHARED_KEY);
                 }
@@ -92,20 +91,19 @@ int main(void)
             addr_bytes[1] = (uint8_t)(rec.address & 0xFF);
             fwrite(addr_bytes, 1, sizeof(addr_bytes), out);
             fwrite(rec.data, 1, rec.data_len, out);
-	    /* Debug traces uncomment for debug*/
+            /* Debug traces uncomment for debug*/
             /* printf("Data record: %u byte(s) at address 0x%04X (checksum OK)\n",
                    rec.data_len, rec.address);*/
         }
-       	if (rec.type == '9') {
+        if (rec.type == '9') {
             printf("End of transmission.\n");
-	    break;
+            break;
         }
     }
-    
+
     ipc_close(fd);
     fclose(out);
     printf("\nReconstructed memory image written to '%s'.\n", output_path);
-    print_reconstructed_message(output_path); 
+    print_reconstructed_message(output_path);
     return 0;
-
 }

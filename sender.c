@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     srec_record_t rec = {0};
     long offset;
     int counter = 0;
-	
+
     /* Usage: ./sender <input_file> [cipher_type]
      * cipher_type: 0 = none (default), 1 = xor_fixed , 2 = add_mod */
     if (argc < 2) {
@@ -40,17 +40,17 @@ int main(int argc, char *argv[])
     if (argc >= 3)
         cipher = atoi(argv[2]);
     FILE *f = fopen(input_path, "rb");
-    /* Get file size */	
+    /* Get file size */
     fseek(f, 0, SEEK_END);
     msg_len = ftell(f);
     rewind(f);
     msg = malloc(msg_len);
-    
+
     /* Read file size */
     fread(msg, 1, msg_len, f);
     fclose(f);
     printf("Loaded %ld bytes from %s\n", msg_len, input_path);
- 
+
     /*set up listening socket */
     listen_fd = ipc_server_open();
     if (listen_fd < 0) {
@@ -73,20 +73,16 @@ int main(int argc, char *argv[])
     srec_encode(&rec, line, sizeof(line));
     send_line(conn_fd, line);
 
-    
     /* S1 : one record per [address|payload] entry of the source file. */
-    for (offset = 0; offset < msg_len; offset += SOURCE_RECORD_SIZE) 
-    {
+    for (offset = 0; offset < msg_len; offset += SOURCE_RECORD_SIZE) {
         uint16_t src_addr = (uint16_t)((msg[offset] << 8) | msg[offset + 1]);
         uint8_t payload[SOURCE_PAYLOAD_SIZE];
         memcpy(payload, &msg[offset + SOURCE_ADDR_SIZE], SOURCE_PAYLOAD_SIZE);
-        if (cipher == CIPHER_XOR) 
-        {
-            for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++)
+        if (cipher == CIPHER_XOR) {
+            for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++) {
                 payload[i] = (uint8_t)(payload[i] ^ PRESHARED_KEY);
-        }
-        else if (cipher == CIPHER_MOD)
-        { 
+            }
+        } else if (cipher == CIPHER_MOD) {
             for (int i = 0; i < SOURCE_PAYLOAD_SIZE; i++) {
                 payload[i] = (uint8_t)(payload[i] + PRESHARED_KEY);
             }

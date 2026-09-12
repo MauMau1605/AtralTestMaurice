@@ -53,6 +53,7 @@ int srec_encode(const srec_record_t *rec, char *out_line, size_t out_size)
     pos += (size_t)snprintf(&out_line[pos], out_size - pos, "%02X", checksum);
     return (int)pos;
 }
+
 int srec_decode(const char *line, srec_record_t *rec)
 {
     size_t len = strlen(line);
@@ -72,10 +73,10 @@ int srec_decode(const char *line, srec_record_t *rec)
     addr_hi = hex_byte(&line[4]);
     addr_lo = hex_byte(&line[6]);
     rec->address = (uint16_t)((addr_hi << 8) | addr_lo);
-    rec->data_len = (uint8_t)(count - 3); 
+    rec->data_len = (uint8_t)(count - 3);
     for (i = 0; i < rec->data_len; i++) {
         rec->data[i] = (uint8_t) hex_byte(&line[8 + i * 2]);
     }
-    
+
     return 0;
 }
