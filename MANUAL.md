@@ -107,6 +107,27 @@ Le `receiver` se connecte au `sender`, traite le flux, écrit `received_image.bi
 cmp ../sample_message.bin received_image.bin && echo "Test OK : Fichiers strictement identiques"
 ```
 
+### Automatisation des Tests & Tâches VS Code
+
+Un script de test automatisé et des tâches VS Code préconfigurées sont disponibles :
+
+- **Via script Bash** :
+  ```bash
+  ./scripts/run_test.sh all   # Exécute et valide les 3 modes (0: No cipher, 1: XOR, 2: MOD)
+  ./scripts/run_test.sh 0     # Teste uniquement sans chiffrement
+  ./scripts/run_test.sh 1     # Teste uniquement avec chiffrement XOR
+  ./scripts/run_test.sh 2     # Teste uniquement avec chiffrement MOD
+  ```
+
+- **Via VS Code / IDE (Ctrl+Shift+B ou Menu `Terminal > Run Task`)** :
+  - **Build Project** : Compilation CMake (`Ctrl+Shift+B` par défaut)
+  - **Test: All (No Cipher, Cipher 1, Cipher 2)** : Lance automatiquement le build puis les 3 tests avec comparaison binaire
+  - **Test: Sender No Cipher (0)** : Teste le mode sans chiffrement
+  - **Test: Sender Cipher 1 (XOR)** : Teste le mode XOR
+  - **Test: Sender Cipher 2 (MOD)** : Teste le mode MOD
+  - **Clean Project** : Nettoie le répertoire de build et les fichiers générés
+
+
 ---
 
 ## 3. Format de l'Image Mémoire

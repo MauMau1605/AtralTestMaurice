@@ -1,0 +1,98 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Project",
+      "type": "shell",
+      "command": "cmake -B build -S . && cmake --build build",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Test: All (No Cipher, Cipher 1, Cipher 2)",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/run_test.sh all",
+      "dependsOn": ["Build Project"],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Test: Sender No Cipher (0)",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/run_test.sh 0",
+      "dependsOn": ["Build Project"],
+      "group": {
+        "kind": "test"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Test: Sender Cipher 1 (XOR)",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/run_test.sh 1",
+      "dependsOn": ["Build Project"],
+      "group": {
+        "kind": "test"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Test: Sender Cipher 2 (MOD)",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/run_test.sh 2",
+      "dependsOn": ["Build Project"],
+      "group": {
+        "kind": "test"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Clean Project",
+      "type": "shell",
+      "command": "rm -rf build received_image.bin",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    }
+  ]
+}

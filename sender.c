@@ -8,7 +8,6 @@
 
 static int send_line(int fd, const char *line)
 {
-    printf("[TX] %s\n", line);
     size_t len = strlen(line);
     char buf[SREC_MAX_LINE_LEN + 1];
     if (len + 1 >= sizeof(buf))
@@ -68,7 +67,6 @@ int main(int argc, char *argv[])
         free(msg);
         return 1;
     }
-    printf("Receiver connected. Sending...\n");
     /* S0 : header, carries CIPHER_TYPE in the address field */
     memset(&rec, 0, sizeof(rec));
     rec.type = '0';
